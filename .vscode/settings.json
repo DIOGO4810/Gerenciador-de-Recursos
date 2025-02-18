@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "math.h": "c",
+        "statfs.h": "c",
+        "statvfs.h": "c",
+        "sysinfo.h": "c",
+        "stdlib.h": "c",
+        "time.h": "c",
+        "unistd.h": "c"
+    }
+}
