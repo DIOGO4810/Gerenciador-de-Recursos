@@ -34,8 +34,8 @@ Selecione o tipo de informação que deseja consultar:
 6 - Temperaturas do sistema  
 
 Insira ENTER caso queira sair Insira '?' caso queira ver os modos novamente  
-Escreva o número correspondente à opção desejada: 2
-Quantidade total de RAM: 15.33 GB
+Escreva o número correspondente à opção desejada: 2  
+Quantidade total de RAM: 15.33 GB  
 Quantidade de RAM disponível: 10.99 GB
 
 
