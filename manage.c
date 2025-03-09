@@ -152,25 +152,6 @@ void manageDisk (disk *infoDisk){
 
 
 
-
-void manageMemLeak (systems *info){
-    printf("A analisar o possivel vazamento de memória ...\n");
-
-    long int antes = info->freeram;
-    sleep(10);
-    sysinfo(info);
-    long int depois = info->freeram;
-     
- if ((antes - depois) > 80 * ToBytes) {
-        printf("Alerta: Possível vazamento de memória detectado.\n");
-    } else {
-        printf("Não foi detectado vazamento de memória.\n");
-    }
-
-
-
-}
-
 void manageTemp(){
     int tempCPU;
     int tempSSD;
@@ -247,9 +228,7 @@ void manage (int mode ){
 
     case 5:manageCPU(&info,stringTemp,files);break;
 
-    case 6:manageMemLeak(&info) ;break;
-
-    case 7:manageTemp() ;break;
+    case 6:manageTemp() ;break;
 
     default:
         printf("Invalid mode\n");
@@ -267,8 +246,7 @@ void infoPrints (){
     printf("3 - Tempo de atividade\n");
     printf("4 - Espaço em disco\n");
     printf("5 - Uso do CPU\n");
-    printf("6 - Verificação de vazamento de memória\n");
-    printf("7 - Temperaturas do sistema\n");
+    printf("6 - Temperaturas do sistema\n");
 }
 
 int validaInput (char* input){
