@@ -25,15 +25,15 @@ make run
 ```
 ## Exemplo de Saída
 
-Selecione o tipo de informação que deseja consultar:
-1 - Informações da bateria
-2 - RAM
-3 - Tempo de atividade
-4 - Espaço em disco
-5 - Uso do CPU
-6 - Temperaturas do sistema
+Selecione o tipo de informação que deseja consultar:  
+1 - Informações da bateria  
+2 - RAM  
+3 - Tempo de atividade  
+4 - Espaço em disco  
+5 - Uso do CPU  
+6 - Temperaturas do sistema  
 
-Insira ENTER caso queira sair Insira '?' caso queira ver os modos novamente
+Insira ENTER caso queira sair Insira '?' caso queira ver os modos novamente  
 Escreva o número correspondente à opção desejada: 2
 Quantidade total de RAM: 15.33 GB
 Quantidade de RAM disponível: 10.99 GB
