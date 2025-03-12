@@ -46,6 +46,10 @@ void manageCPU(systems *info,char stringTemp[],FILE *files){
 
     
     files = fopen("/sys/class/thermal/thermal_zone7/temp","r");
+    if(files == NULL){
+        fprintf(stderr,"Arquitetura não suportada");
+        return;
+    }
     
 
    if (fgets(stringTemp, size, files) != NULL) {
@@ -106,6 +110,21 @@ void manageUpTime (systems *info){
     unsigned long remainingMinutes = UpMin % 60;
     FILE *batteryNow = fopen("/sys/class/power_supply/BAT1/charge_now", "r");
     FILE *batteryFull = fopen("/sys/class/power_supply/BAT1/charge_full", "r");
+
+    if(batteryFull == NULL && batteryNow == NULL){
+        if(UpHours < 1)
+        {
+            printf("O sistema está aberto a %ld minutos\n",UpMin);   
+        }
+        else
+        {
+            printf("O sistema está aberto a %ld horas e %ld minutos \n",UpHours,remainingMinutes);    
+        }
+
+
+        fprintf(stderr,"Arquitetura não suportada para as informações da bateria gasta");
+        return;
+    }
 
     char fullBattery[256];
     float intfullBattery = atoi(fgets(fullBattery,sizeof(fullBattery),batteryFull));
@@ -169,7 +188,10 @@ void manageTemp(){
     
     filesCPU = fopen("/sys/class/thermal/thermal_zone7/temp","r");
     filesSSD = fopen("/sys/class/hwmon/hwmon4/temp1_input","r");
-
+    if(filesCPU == NULL && filesSSD == NULL){
+            fprintf(stderr,"Arquitetura não suportada");
+            return;
+    }
 
     if (fgets(stringTempCPU,size,filesCPU) != NULL && fgets(stringTempSSD,size,filesSSD) != NULL )
     {
@@ -189,7 +211,11 @@ void manageTemp(){
 void manageBattery () {
 
     FILE *batteryDischarge = fopen("/sys/class/power_supply/BAT1/current_now", "r");
-    
+    if(batteryDischarge == NULL){
+        fprintf(stderr,"Arquitetura não suportada");
+        return;
+
+    }
 
     float discharge = 0;
     char dischargeString[256];
