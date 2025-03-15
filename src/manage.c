@@ -7,6 +7,7 @@
 #include <ctype.h>
 #include <sys/statvfs.h>
 #include <stdlib.h>
+#include "parser.h"
 
 
 
@@ -61,6 +62,9 @@ void manageCPU(systems *info,char stringTemp[],FILE *files){
     
     // Fecha o arquivo
     fclose(files);
+
+
+    coresInfo();
 
     
 

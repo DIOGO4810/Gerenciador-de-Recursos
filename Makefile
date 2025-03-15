@@ -1,26 +1,31 @@
-# Nome do executável
-TARGET = manage
+CC := gcc
 
-# Arquivos fonte
-SOURCES = manage.c
+EXEC := manage
 
-# Comando do compilador
-CC = gcc
+CFLAGS := -Wall -O3 -g -flto -std=gnu99 -Wextra -pedantic -Iincludes
 
-# Flags do compilador
-CFLAGS = -O2 -Wall -Wextra -std=c99
+SRC := $(shell find src/ -name "*.c")
+OBJ := $(SRC:src/%.c=build/%.o)
 
-# Regra padrão: compilar e executar
-all: $(TARGET)
 
-$(TARGET): $(SOURCES)
-	@$(CC) $(CFLAGS) -o $(TARGET) $(SOURCES)
+.PHONY: all
+all: $(EXEC) 
 
-run: $(TARGET)
-	@./$(TARGET)
+$(EXEC): $(OBJ)
+	@$(CC) $(OBJ) $(EXTERNAL_OBJ)  -o $@ ; echo "[Linking] $@"
 
-# Limpar os arquivos compilados
+
+build/%.o: src/%.c
+	@mkdir -p $(dir $@)
+	@$(CC) $(CFLAGS) -c $< -o $@ ; echo "[Compiling] $@"
+
+
+run: $(EXEC)
+	@./$(EXEC)
+
+
+
+.PHONY: clean
 clean:
-	rm -f $(TARGET)
-
-.PHONY: all run clean
+	rm -rf build
+	rm -f $(EXEC)
