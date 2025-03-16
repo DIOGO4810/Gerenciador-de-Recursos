@@ -10,7 +10,7 @@ O programa oferece as seguintes funcionalidades:
 2. **Informações da Memória RAM**: Exibe a quantidade total e disponível de RAM no sistema.
 3. **Tempo de Atividade do Sistema**: Exibe o tempo total que o sistema está em funcionamento, tanto em horas quanto em minutos.
 4. **Espaço em Disco**: Exibe a quantidade total, livre e usada de espaço no disco rígido.
-5. **Uso do CPU**: Exibe a carga média do CPU e a temperatura atual do processador.
+5. **Uso do CPU e Threads**: Exibe a carga média do CPU e a temperatura atual do mesmo como também a visualização da percentagem de utilização de cada uma das Threads da máquina.
 6. **Temperatura do Sistema**: Exibe a temperatura do processador e do SSD, atualizada a cada segundo por um período de 8 segundos.
 
 ## Requisitos
