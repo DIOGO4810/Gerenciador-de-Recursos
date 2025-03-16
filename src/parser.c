@@ -10,14 +10,13 @@ struct parser
 {
     FILE *file;
 
-    char *line;
+    char* line;
 
     char **tokens;
-
-    int offset;
 };
 
-struct cpuStage{
+struct cpuStage
+{
     int user, nice, system, idle, iowait, irq, softirq, steal;
 };
 
@@ -28,19 +27,12 @@ Parser *newParser(char *diretoria)
     parserE->file = fopen(diretoria, "r");
     parserE->tokens = malloc(MaxTokensSize * sizeof(char *));
     parserE->line = NULL;
-    parserE->offset = 0;
-
     return parserE;
 }
 
-Parser *parser(Parser *parserE, char *diretoria, int flag)
+Parser *parser(Parser *parserE)
 {
-    if (flag)
-    {
-        parserE->file = fopen(diretoria, "r");
-        if (fseek(parserE->file, parserE->offset, SEEK_CUR) != 0)
-            printf("erro");
-    }
+
     size_t len = 0;
     char *line = NULL;
 
@@ -58,10 +50,7 @@ Parser *parser(Parser *parserE, char *diretoria, int flag)
         line[strlen(line) - 1] = '\0';
     }
 
-    parserE->line = strdup(line);
-
-    if (flag)
-        parserE->offset += strlen(parserE->line) + 1;
+    parserE->line = line;
 
     char *lineCopy = line;
 
@@ -76,15 +65,15 @@ Parser *parser(Parser *parserE, char *diretoria, int flag)
         token = strsep(&lineCopy, " ");
     }
 
-    fclose(parserE->file);
-
     return parserE;
 }
 
 // Função que dá free da memoria para a estrutura e os campos do Parser
 void freeParser(Parser *parserE)
 {
+    fclose(parserE->file);
     free(parserE->tokens);
+    free(parserE->line);
     free(parserE);
 }
 
@@ -105,77 +94,90 @@ char *pegaLinha(Parser *parserE)
     {
         line[strlen(line) - 1] = '\0';
     }
-    fclose(parserE->file);
-    parserE->offset += strlen(line);
-    parserE->offset += 1;
+
     return line;
 }
 
-char **getTokens(Parser *parserE)
-{
-    if (parserE->tokens[0] == NULL)
-        return NULL;
-
-    return parserE->tokens;
-}
 
 void coresInfo()
 {
 
     Parser *parserStat = newParser("/proc/stat");
     char *totalCoreLine = pegaLinha(parserStat);
+    free(totalCoreLine);
 
-    int user, nice, system, idle, iowait, irq, softirq, steal;
-    int prevUser, prevNice, prevSystem, prevIdle, prevIowait, prevIrq, prevSoftirq, prevSteal;
     int i = 0;
+    CpuStage prevStage[64];
+    CpuStage currentStage[64];
+    int dataOrEnd = 0;
+
     while (1)
     {
-        i++;
 
-        parserStat = parser(parserStat, "/proc/stat", 1);
+        CpuStage stage;
+
+        parserStat = parser(parserStat);
 
         if (parserStat->tokens == NULL || strcmp(parserStat->tokens[0], "intr") == 0)
         {
-            freeParser(parserStat);
-            break;
+            if (dataOrEnd == 0)
+            {
+                free(parserStat->line);
+                fclose(parserStat->file);
+                sleep(1);
+                parserStat->file = fopen("/proc/stat", "r");
+                dataOrEnd++;
+                i = 0;
+                char *totalCoreLine = pegaLinha(parserStat);
+                free(totalCoreLine);
+                continue;
+            }
+
+            if (dataOrEnd == 1)
+            {
+                freeParser(parserStat);
+                break;
+            }
         }
 
-        prevUser = atoi(parserStat->tokens[1]);
-        prevNice = atoi(parserStat->tokens[2]);
-        prevSystem = atoi(parserStat->tokens[3]);
-        prevIdle = atoi(parserStat->tokens[4]);
-        prevIowait = atoi(parserStat->tokens[5]);
-        prevIrq = atoi(parserStat->tokens[6]);
-        prevSoftirq = atoi(parserStat->tokens[7]);
-        prevSteal = atoi(parserStat->tokens[8]);
+        stage.user = atoi(parserStat->tokens[1]);
+        stage.nice = atoi(parserStat->tokens[2]);
+        stage.system = atoi(parserStat->tokens[3]);
+        stage.idle = atoi(parserStat->tokens[4]);
+        stage.iowait = atoi(parserStat->tokens[5]);
+        stage.irq = atoi(parserStat->tokens[6]);
+        stage.softirq = atoi(parserStat->tokens[7]);
+        stage.steal = atoi(parserStat->tokens[8]);
 
-        sleep(1);
-        parserStat->file = fopen("/proc/stat", "r");
-        fseek(parserStat->file, parserStat->offset - strlen(parserStat->line) - 1, SEEK_SET);
+        if (dataOrEnd == 0)
+        {
+            prevStage[i] = stage;
+        }
+        else if (dataOrEnd == 1)
+        {
+            currentStage[i] = stage;
+        }
 
-        parserStat = parser(parserStat, "/proc/stat", 0);
+        i++;
+        free(parserStat->line);
+    }
+    printf("\n");
 
-        user = atoi(parserStat->tokens[1]);
-        nice = atoi(parserStat->tokens[2]);
-        system = atoi(parserStat->tokens[3]);
-        idle = atoi(parserStat->tokens[4]);
-        iowait = atoi(parserStat->tokens[5]);
-        irq = atoi(parserStat->tokens[6]);
-        softirq = atoi(parserStat->tokens[7]);
-        steal = atoi(parserStat->tokens[8]);
+    for (int j = 0, newline = 0; j < i; j++, newline++)
+    {
 
-        unsigned long deltaActive = (user + nice + system + irq + softirq + steal) -
-                                    (prevUser + prevNice + prevSystem + prevIrq + prevSoftirq + prevSteal);
+        unsigned long deltaActive = (currentStage[j].user + currentStage[j].nice + currentStage[j].system + currentStage[j].irq + currentStage[j].softirq + currentStage[j].steal) -
+                                    (prevStage[j].user + prevStage[j].nice + prevStage[j].system + prevStage[j].irq + prevStage[j].softirq + prevStage[j].steal);
 
-        unsigned long deltaTotal = (user + nice + system + idle + iowait + irq + softirq + steal) -
-                                   (prevUser + prevNice + prevSystem + prevIdle + prevIowait + prevIrq + prevSoftirq + prevSteal);
-
+        unsigned long deltaTotal = (currentStage[j].user + currentStage[j].nice + currentStage[j].system + currentStage[j].irq + currentStage[j].softirq + currentStage[j].steal + currentStage[j].idle + currentStage[j].iowait) -
+                                   (prevStage[j].user + prevStage[j].nice + prevStage[j].system + prevStage[j].irq + prevStage[j].softirq + prevStage[j].steal + prevStage[j].idle + prevStage[j].iowait);
 
         double cpuUsage = (deltaTotal > 0) ? (100.0 * deltaActive / deltaTotal) : 0.0;
-
-        printf("Thread%d usage:%.2f%%\n",i,cpuUsage);
-
-        
-                           
+        if (newline >= 4)
+        {
+            printf("\n\n");
+            newline = 0;
+        }
+        printf("Thread %d :%.2f%%    ", j+1, cpuUsage);
     }
 }

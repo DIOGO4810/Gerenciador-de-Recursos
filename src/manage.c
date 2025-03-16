@@ -184,7 +184,7 @@ void manageTemp(){
     FILE *filesSSD = NULL;
 
     printf("A seguir estão as temperaturas atuais do sistema, atualizadas a cada segundo durante um período de 8 segundos:\n");
-    sleep(3);
+    sleep(2);
     printf("O processador está a:\t\t O SSD está a:\n");
 
     for (int i = 0; i < 8; i++)
