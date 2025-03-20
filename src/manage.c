@@ -115,7 +115,7 @@ void manageUpTime (systems *info){
     FILE *batteryNow = fopen("/sys/class/power_supply/BAT1/charge_now", "r");
     FILE *batteryFull = fopen("/sys/class/power_supply/BAT1/charge_full", "r");
 
-    if(batteryFull == NULL && batteryNow == NULL){
+    if(batteryFull == NULL || batteryNow == NULL){
         if(UpHours < 1)
         {
             printf("O sistema está aberto a %ld minutos\n",UpMin);   
@@ -139,12 +139,12 @@ void manageUpTime (systems *info){
     if(UpHours < 1)
     {
         printf("O sistema está aberto a %ld minutos\n",UpMin);   
-        printf("O sistema gastou %.2f%% de bateria nesse tempo\n",waistedBattery);
+        printf("O sistema gastou %.2f%% de bateria \n",waistedBattery);
     }
     else
     {
         printf("O sistema está aberto a %ld horas e %ld minutos \n",UpHours,remainingMinutes);
-        printf("O sistema gastou %.2f%% de bateria nesse tempo\n",waistedBattery);
+        printf("O sistema gastou %.2f%% de bateria \n",waistedBattery);
 
     }
 
@@ -192,7 +192,7 @@ void manageTemp(){
     
     filesCPU = fopen("/sys/class/thermal/thermal_zone7/temp","r");
     filesSSD = fopen("/sys/class/hwmon/hwmon4/temp1_input","r");
-    if(filesCPU == NULL && filesSSD == NULL){
+    if(filesCPU == NULL || filesSSD == NULL){
             fprintf(stderr,"Arquitetura não suportada");
             return;
     }
